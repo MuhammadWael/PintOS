@@ -70,8 +70,7 @@ static void *alloc_frame (struct thread *, size_t size);
 static void schedule (void);
 void thread_schedule_tail (struct thread *prev);
 static tid_t allocate_tid (void);
-void thread_test_preemption(void);
-bool thread_compare_priority(struct list_elem *large ,struct list_elem *small ,void *aux UNUSED);
+
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
@@ -344,9 +343,9 @@ thread_test_preemption(void)
 }
 /*Compare the priority */
 bool 
-thread_compare_priority(struct list_elem *large ,struct list_elem *small ,void *aux UNUSED)
+thread_compare_priority(struct list_elem *f ,struct list_elem *s)
 {
-  return (list_entry(large, struct thread, elem)->priority > list_entry(small, struct thread, elem)->priority);
+  return (list_entry(f, struct thread, elem)->priority > list_entry(s, struct thread, elem)->priority);
 }
 
 /* Sets the current thread's priority to NEW_PRIORITY. */
