@@ -240,15 +240,10 @@ thread_create (const char *name, int priority,
  sf->ebp = 0;
 
 
-<<<<<<< HEAD
   /* Add to run queue. */
   thread_unblock (t);
   //added to test preemption 
   thread_test_preemption();
-=======
- /* Add to run queue. */
- thread_unblock (t);
->>>>>>> f7fcfa12de39010fbe82686cf80a4ec68bb9fcc1
 
 
  return tid;
@@ -291,21 +286,12 @@ thread_unblock (struct thread *t)
 
  ASSERT (is_thread (t));
 
-<<<<<<< HEAD
   old_level = intr_disable ();
   ASSERT (t->status == THREAD_BLOCKED);
   //list_push_back (&ready_list, &t->elem);
   list_insert_ordered (&ready_list, &t->elem, thread_compare_priority, 0);
   t->status = THREAD_READY;
   intr_set_level (old_level);
-=======
-
- old_level = intr_disable ();
- ASSERT (t->status == THREAD_BLOCKED);
- list_push_back (&ready_list, &t->elem);
- t->status = THREAD_READY;
- intr_set_level (old_level);
->>>>>>> f7fcfa12de39010fbe82686cf80a4ec68bb9fcc1
 }
 
 
@@ -378,7 +364,6 @@ thread_yield (void)
  enum intr_level old_level;
   ASSERT (!intr_context ());
 
-<<<<<<< HEAD
   old_level = intr_disable ();
   if (cur != idle_thread) 
     //list_push_back (&ready_list, &cur->elem);
@@ -386,15 +371,6 @@ thread_yield (void)
   cur->status = THREAD_READY;
   schedule ();
   intr_set_level (old_level);
-=======
-
- old_level = intr_disable ();
- if (cur != idle_thread)
-   list_push_back (&ready_list, &cur->elem);
- cur->status = THREAD_READY;
- schedule ();
- intr_set_level (old_level);
->>>>>>> f7fcfa12de39010fbe82686cf80a4ec68bb9fcc1
 }
 
 
@@ -517,20 +493,16 @@ mlfqs_calculate_load_avg (void)
 int
 thread_get_priority (void)
 {
-<<<<<<< HEAD
   return thread_current ()->priority;
   //add test preemption 
   thread_test_preemption();
-=======
- return thread_current ()->priority;
->>>>>>> f7fcfa12de39010fbe82686cf80a4ec68bb9fcc1
 }
 
 
 /* Sets the current thread's nice value to NICE. */
 void
 thread_set_nice (int nice UNUSED)
-{ // 현재 스레드의 nice 값을 새 값으로 설정
+{ 
  enum intr_level old_level = intr_disable ();
  thread_current ()->nice = nice;
  mlfqs_calculate_priority (thread_current ());
@@ -810,12 +782,3 @@ allocate_tid (void)
   Used by switch.S, which can't figure it out on its own. */
 uint32_t thread_stack_ofs = offsetof (struct thread, stack);
 
-
-void
-thread_test_preemption (void)
-{
-   if (!list_empty (&ready_list) &&
-   thread_current ()->priority <
-   list_entry (list_front (&ready_list), struct thread, elem)->priority)
-       thread_yield ();
-}
