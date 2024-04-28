@@ -313,7 +313,7 @@ thread_yield (void)
   old_level = intr_disable ();
   if (cur != idle_thread) 
     //list_push_back (&ready_list, &cur->elem);
-    list_insert_ordered(&ready_list, &cur->element, thread_compare_priority, 0);
+    list_insert_ordered(&ready_list, &cur->elem, thread_compare_priority, 0);
   cur->status = THREAD_READY;
   schedule ();
   intr_set_level (old_level);
@@ -339,8 +339,8 @@ thread_foreach (thread_action_func *func, void *aux)
 void 
 thread_test_preemption(void)
 {
-  if(!list_empty(&ready_list) && thread_current()->prority < list_entry(list_front(&ready_list), struct thread , elem)->priority)
-    thread-yield();
+  if(!list_empty(&ready_list) && thread_current()->priority < list_entry(list_front(&ready_list), struct thread , elem)->priority)
+    thread_yield();
 }
 /*Compare the priority */
 bool 
