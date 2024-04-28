@@ -70,7 +70,8 @@ static void *alloc_frame (struct thread *, size_t size);
 static void schedule (void);
 void thread_schedule_tail (struct thread *prev);
 static tid_t allocate_tid (void);
-
+void thread_test_preemption(void);
+bool thread_compare_priority(struct list_elem *large ,struct list_elem *small ,void *aux UNUSED);
 /* Initializes the threading system by transforming the code
    that's currently running into a thread.  This can't work in
    general and it is possible in this case only because loader.S
@@ -200,6 +201,8 @@ thread_create (const char *name, int priority,
 
   /* Add to run queue. */
   thread_unblock (t);
+  //added to test preemption 
+  thread_test_preemption();
 
   return tid;
 }
@@ -237,7 +240,8 @@ thread_unblock (struct thread *t)
 
   old_level = intr_disable ();
   ASSERT (t->status == THREAD_BLOCKED);
-  list_push_back (&ready_list, &t->elem);
+  //list_push_back (&ready_list, &t->elem);
+  list_insert_ordered (&ready_list, &t->elem, thread_compare_priority, 0);
   t->status = THREAD_READY;
   intr_set_level (old_level);
 }
@@ -308,7 +312,8 @@ thread_yield (void)
 
   old_level = intr_disable ();
   if (cur != idle_thread) 
-    list_push_back (&ready_list, &cur->elem);
+    //list_push_back (&ready_list, &cur->elem);
+    list_insert_ordered(&ready_list, &cur->element, thread_compare_priority, 0);
   cur->status = THREAD_READY;
   schedule ();
   intr_set_level (old_level);
@@ -330,6 +335,19 @@ thread_foreach (thread_action_func *func, void *aux)
       func (t, aux);
     }
 }
+/*Check that current thread has higher prority than the fron of list*/
+void 
+thread_test_preemption(void)
+{
+  if(!list_empty(&ready_list) && thread_current()->prority < list_entry(list_front(&ready_list), struct thread , elem)->priority)
+    thread-yield();
+}
+/*Compare the priority */
+bool 
+thread_compare_priority(struct list_elem *large ,struct list_elem *small ,void *aux UNUSED)
+{
+  return (list_entry(large, struct thread, elem)->priority > list_entry(small, struct thread, elem)->priority);
+}
 
 /* Sets the current thread's priority to NEW_PRIORITY. */
 void
@@ -343,6 +361,8 @@ int
 thread_get_priority (void) 
 {
   return thread_current ()->priority;
+  //add test preemption 
+  thread_test_preemption();
 }
 
 /* Sets the current thread's nice value to NICE. */
